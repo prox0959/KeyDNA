@@ -1,0 +1,170 @@
+/* Hacker aesthetic variables */
+/* TR: Hacker estetiği değişkenleri */
+:root {
+    --bg-color: #0d1117;
+    --panel-bg: #161b22;
+    --text-primary: #c9d1d9;
+    --text-secondary: #8b949e;
+    --accent-color: #00FF41; /* Hacker Green */
+    --accent-hover: #00cc33;
+    --error-color: #ff3333;
+    --border-color: #30363d;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    font-family: 'Courier New', Courier, monospace; /* Monospace for hacker feel */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.container {
+    width: 90%;
+    max-width: 800px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+header h1 {
+    font-size: 3rem;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.highlight {
+    color: var(--accent-color);
+}
+
+.panel {
+    background-color: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+.mode-selector {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+button {
+    flex: 1;
+    background-color: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    padding: 0.8rem;
+    font-family: inherit;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    border-radius: 4px;
+}
+
+button.active {
+    background-color: rgba(0, 255, 65, 0.1);
+    color: var(--accent-color);
+    border-color: var(--accent-color);
+    box-shadow: 0 0 10px rgba(0, 255, 65, 0.2);
+}
+
+button:hover:not(.active) {
+    border-color: var(--text-secondary);
+}
+
+.input-group {
+    margin-bottom: 1.5rem;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--accent-color);
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 1rem;
+    background-color: #000;
+    border: 1px solid var(--border-color);
+    color: var(--accent-color);
+    font-family: inherit;
+    font-size: 1.2rem;
+    box-sizing: border-box;
+    border-radius: 4px;
+}
+
+input[type="text"]:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 8px rgba(0, 255, 65, 0.3);
+}
+
+.instruction-box {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    border: 1px dashed var(--border-color);
+}
+
+.target-phrase {
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    background: #000;
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    margin: 1rem 0;
+    border-radius: 4px;
+}
+
+.counter {
+    color: var(--accent-color);
+    font-weight: bold;
+}
+
+.feedback {
+    text-align: center;
+    padding: 1.5rem;
+    border-radius: 4px;
+    margin-top: 1rem;
+}
+
+.feedback.hidden {
+    display: none;
+}
+
+.feedback.success {
+    background-color: rgba(0, 255, 65, 0.1);
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color);
+}
+
+.feedback.error {
+    background-color: rgba(255, 51, 51, 0.1);
+    border: 1px solid var(--error-color);
+    color: var(--error-color);
+}
+
+.visualization-panel {
+    background-color: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}

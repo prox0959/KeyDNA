@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KeyDNA - Keystroke Dynamics</title>
+    <!-- Include our custom styles -->
+    <!-- TR: Özel stillerimizi dahil ediyoruz -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Include Chart.js for visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><span class="highlight">Key</span>DNA 🧬</h1>
+            <p>Biometric Authentication System</p>
+        </header>
+
+        <main>
+            <div class="panel">
+                <div class="mode-selector">
+                    <!-- Buttons to switch between Enroll and Verify modes -->
+                    <!-- TR: Kayıt ve Doğrulama modları arasında geçiş yapmak için düğmeler -->
+                    <button id="btn-enroll" class="active">ENROLL</button>
+                    <button id="btn-verify">VERIFY</button>
+                </div>
+
+                <div class="input-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" placeholder="Enter username">
+                </div>
+
+                <div class="instruction-box">
+                    <p id="instruction-text">Type the phrase below <strong>5 times</strong> to create your typing DNA.</p>
+                    <p class="target-phrase">the quick brown fox</p>
+                    <p id="counter" class="counter">Attempts: 0/5</p>
+                </div>
+
+                <div class="input-group">
+                    <input type="text" id="phrase-input" placeholder="Type the phrase here..." autocomplete="off" spellcheck="false">
+                </div>
+
+                <div id="feedback" class="feedback hidden">
+                    <!-- Status message (Match / Imposter) -->
+                    <!-- TR: Durum mesajı (Eşleşme / Sahtekar) -->
+                    <h2 id="feedback-message"></h2>
+                    <p>Confidence: <span id="confidence-score"></span>%</p>
+                </div>
+            </div>
+
+            <div class="visualization-panel">
+                <h3>Typing Rhythm Analysis</h3>
+                <div class="chart-container">
+                    <canvas id="typingChart"></canvas>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Include our custom JavaScript logic -->
+    <!-- TR: Özel JavaScript mantığımızı dahil ediyoruz -->
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
