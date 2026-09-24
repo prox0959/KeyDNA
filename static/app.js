@@ -123,8 +123,19 @@ btnVerify.addEventListener('click', () => setMode('verify'));
 // Event Listener for KeyDown: Capture the exact timestamp when a key is pressed
 // TR: Tuşa basıldığında tam zaman damgasını yakalar
 phraseInput.addEventListener('keydown', (e) => {
-    // Ignore special keys for the phrase typing
-    if (e.key === 'Shift' || e.key === 'CapsLock' || e.key === 'Backspace') return;
+    // Ignore special non-character keys
+    if (e.key === 'Shift' || e.key === 'CapsLock' || e.key === 'Control' || e.key === 'Alt') return;
+    
+    if (e.key === 'Backspace') {
+        // TR: Backspace tuşuna basıldığında son tuş kaydını listeden temizle
+        while (currentTimings.length > 0 && currentTimings[currentTimings.length - 1].type !== 'keydown') {
+            currentTimings.pop();
+        }
+        if (currentTimings.length > 0) {
+            currentTimings.pop();
+        }
+        return;
+    }
     
     currentTimings.push({
         key: e.key,
@@ -136,7 +147,7 @@ phraseInput.addEventListener('keydown', (e) => {
 // Event Listener for KeyUp: Capture the exact timestamp when a key is released
 // TR: Tuş bırakıldığında tam zaman damgasını yakalar
 phraseInput.addEventListener('keyup', (e) => {
-    if (e.key === 'Shift' || e.key === 'CapsLock' || e.key === 'Backspace') return;
+    if (e.key === 'Shift' || e.key === 'CapsLock' || e.key === 'Control' || e.key === 'Alt' || e.key === 'Backspace') return;
     
     currentTimings.push({
         key: e.key,

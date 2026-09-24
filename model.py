@@ -50,21 +50,38 @@ class KeystrokeModel:
     def train_profile(self, multiple_timings):
         """
         Create a user profile by averaging features from multiple typing samples.
-        TR: Birden fazla yazma örneğinin ortalamasını alarak bir kullanıcı profili oluşturur.
+        Robust to slight length differences across attempts due to typos or timing variations.
+        TR: Birden fazla yazma örneğinin ortalamasını alarak güvenli bir kullanıcı profili oluşturur.
+        Yazım hataları veya zamanlama farklılıklarından kaynaklanan uzunluk değişimlerini otomatik dengeler.
         """
         all_dwells = []
         all_flights = []
         
         for timings in multiple_timings:
             features = self.calculate_features(timings)
-            all_dwells.append(features['dwell'])
-            all_flights.append(features['flight'])
+            if features['dwell']:
+                all_dwells.append(features['dwell'])
+            if features['flight']:
+                all_flights.append(features['flight'])
             
-        # Calculate the mean (average) for each position in the lists
-        # We use numpy to easily calculate the average across all attempts
-        # TR: Tüm denemelerdeki ortalama değerleri hesaplıyoruz.
-        avg_dwell = np.mean(all_dwells, axis=0).tolist() if all_dwells and len(all_dwells[0]) > 0 else []
-        avg_flight = np.mean(all_flights, axis=0).tolist() if all_flights and len(all_flights[0]) > 0 else []
+        if not all_dwells:
+            return {'mean_dwell': [], 'mean_flight': []}
+
+        # TR: Heterojen liste uzunluklarını önlemek için güvenli sütun bazlı ortalama hesaplanır
+        target_dwell_len = int(np.median([len(d) for d in all_dwells]))
+        target_flight_len = int(np.median([len(f) for f in all_flights])) if all_flights else 0
+
+        avg_dwell = []
+        for col in range(target_dwell_len):
+            vals = [d[col] for d in all_dwells if col < len(d)]
+            if vals:
+                avg_dwell.append(float(np.mean(vals)))
+
+        avg_flight = []
+        for col in range(target_flight_len):
+            vals = [f[col] for f in all_flights if col < len(f)]
+            if vals:
+                avg_flight.append(float(np.mean(vals)))
         
         return {
             'mean_dwell': avg_dwell,
@@ -73,35 +90,41 @@ class KeystrokeModel:
 
     def verify(self, profile, current_timings):
         """
-        Compare current typing against the saved profile using Euclidean distance.
+        Compare current typing against the saved profile using Manhattan distance.
         Returns match boolean and confidence percentage.
-        TR: Mevcut yazma şeklini kaydedilmiş profil ile karşılaştırır.
+        TR: Mevcut yazma şeklini kaydedilmiş profil ile Manhattan mesafesi kullanarak karşılaştırır.
         """
         current_features = self.calculate_features(current_timings)
         
         c_dwell = current_features['dwell']
         c_flight = current_features['flight']
         
-        p_dwell = profile['mean_dwell']
-        p_flight = profile['mean_flight']
+        p_dwell = profile.get('mean_dwell', [])
+        p_flight = profile.get('mean_flight', [])
         
-        # Check if the lengths match. If the user typed a different phrase, it won't match.
-        if len(c_dwell) != len(p_dwell) or len(c_flight) != len(p_flight):
+        if not p_dwell or not c_dwell:
+            return False, 0.0
+
+        min_dwell = min(len(c_dwell), len(p_dwell))
+        min_flight = min(len(c_flight), len(p_flight))
+
+        # Check if the length differs wildly (e.g. completely wrong phrase)
+        len_diff = abs(len(c_dwell) - len(p_dwell))
+        if len_diff > 4:
             return False, 0.0
             
-        # Calculate Manhattan distance (absolute differences) for simplicity and robustness
-        # TR: Basitlik ve sağlamlık için Manhattan mesafesini (mutlak farklar) hesaplıyoruz.
-        dwell_diff = sum(abs(a - b) for a, b in zip(c_dwell, p_dwell))
-        flight_diff = sum(abs(a - b) for a, b in zip(c_flight, p_flight))
+        # Calculate Manhattan distance (absolute differences) for common positions
+        # TR: Ortak tuş pozisyonları için Manhattan mesafesini hesaplıyoruz
+        dwell_diff = sum(abs(c_dwell[i] - p_dwell[i]) for i in range(min_dwell))
+        flight_diff = sum(abs(c_flight[i] - p_flight[i]) for i in range(min_flight))
         
-        total_distance = dwell_diff + flight_diff
+        # Penalize slight length mismatch
+        length_penalty = len_diff * 40.0
+        total_distance = dwell_diff + flight_diff + length_penalty
         
         # Calculate confidence score (0 to 100)
-        # If distance is 0, confidence is 100%. As distance increases, confidence drops.
+        # TR: Güven skorunu hesapla (0 - 100 arası)
         confidence = max(0.0, 100.0 - (total_distance / self.threshold * 50.0))
-        
-        # The user is verified if the distance is below the threshold
-        # TR: Eğer mesafe eşiğin altındaysa kullanıcı doğrulanmış olur.
         is_match = total_distance < self.threshold
         
         return is_match, round(confidence, 2)
